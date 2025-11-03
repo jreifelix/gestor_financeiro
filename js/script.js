@@ -13,7 +13,10 @@ let charts = {
     total: null,
     pprs: null,
     ativos: null,
-    gastosCC: {} // NOVO: Objeto para armazenar instâncias de gráficos de gastos por mês
+    gastosCC: {}, // NOVO: Objeto para armazenar instâncias de gráficos de gastos por mês
+    futuroTotal: null,
+    futuroPprs: null,
+    futuroAtivos: null
 };
 
 const meses = [
@@ -57,7 +60,9 @@ function atualizarUICompleta() {
     gerarInputsObjetivos();
     atualizarDashboard();
     atualizarTabelaAnual();
+
     atualizarGraficos();
+    atualizarGraficosFuturo();
 }
 
 // --- INICIALIZAÇÃO E EVENTOS GERAIS ---
@@ -115,7 +120,6 @@ function initSeletorUtilizador() {
     seletorUtilizador.addEventListener("change", alterarUtilizador);
 }
 
-// --- LÓGICA DE DADOS (CARREGAR, SALVAR, INICIALIZAR) ---
 
 /**
  * [VERSÃO CORRIGIDA E FINAL]
@@ -127,28 +131,35 @@ function carregarDados() {
         const dadosSalvos = localStorage.getItem('finance_data');
         if (dadosSalvos) {
             const parsedData = JSON.parse(dadosSalvos);
-            // Carrega os dados como estão.
+            
+            // Carrega os dados como estão, mesmo que corrompidos.
             financeData.years = parsedData.years || {};
             financeData.currentYear = parsedData.currentYear || new Date().getFullYear();
             financeData.currentUser = parsedData.currentUser || "AMBOS";
 
-            // --- CORREÇÃO CRÍTICA ADICIONADA AQUI ---
+            // --- LIMPEZA E MIGRAÇÃO CRÍTICA ---
             // Imediatamente após carregar, percorre TODOS os dados existentes e garante
-            // que a sua estrutura está correta e migrada.
-            // Isto previne que dados incompletos ou de versões antigas corrompam o estado da aplicação.
+            // que a sua estrutura está correta e migrada para o novo formato.
+            // Isto previne que dados de versões antigas corrompam o estado da aplicação.
             Object.keys(financeData.years).forEach(year => {
+                // Primeiro, remove as chaves de categoria que foram criadas erradamente ao nível do ano.
+                ['conta-corrente', 'ativos', 'pprs', 'poupancas', 'outros', 'objectives'].forEach(cat => {
+                    if (financeData.years[year][cat]) {
+                        delete financeData.years[year][cat];
+                    }
+                });
+
+                // Depois, garante que a estrutura para cada utilizador está correta.
                 Object.keys(financeData.years[year]).forEach(user => {
-                    // Verifica se a chave não é uma das categorias que foi criada erradamente.
-                    // Esta é uma salvaguarda extra para limpar dados corrompidos.
                     if (user === "JORGE" || user === "RITA" || user === "AMBOS") {
                         garantirEstruturaDados(parseInt(year), user);
                     }
                 });
             });
-            // --- FIM DA CORREÇÃO CRÍTICA ---
+            // --- FIM DA LIMPEZA E MIGRAÇÃO ---
 
         } else {
-            // Se não houver dados salvos, inicializa do zero.
+            // Se não houver dados salvos, inicializa do zero com a estrutura correta.
             inicializarDados();
         }
         
@@ -158,11 +169,13 @@ function carregarDados() {
     } catch (error) {
         console.error('Erro fatal ao carregar ou reparar dados:', error);
         mostrarToast('Erro ao carregar dados. A inicializar do zero.', 'error');
-        // Se ocorrer um erro irrecuperável, inicializa a aplicação do zero para evitar mais problemas.
+        // Se ocorrer um erro irrecuperável, inicializa a aplicação do zero.
         inicializarDados();
     }
+    
+    // Salva os dados imediatamente após a limpeza e migração.
+    salvarDados();
 }
-
 
 
 function salvarDados() {
@@ -204,9 +217,11 @@ function inicializarDadosAno(year) {
     });
 }
 
+
 // script.js - Substituir a função inicializarDadosUtilizadorAno
 
 /**
+ * [VERSÃO CORRIGIDA]
  * Inicializa a estrutura de dados completa para um utilizador específico dentro de um ano.
  * Garante que a hierarquia Ano -> Utilizador -> Categoria -> Mês é criada corretamente.
  * @param {number} year - O ano para o qual os dados serão inicializados.
@@ -219,7 +234,7 @@ function inicializarDadosUtilizadorAno(year, user) {
     }
 
     // --- CORREÇÃO PRINCIPAL ---
-    // Cria o objeto para o utilizador específico, se ainda não existir.
+    // Cria o objeto para o utilizador específico DENTRO do ano, se ainda não existir.
     if (!financeData.years[year][user]) {
         financeData.years[year][user] = {};
     }
@@ -227,7 +242,7 @@ function inicializarDadosUtilizadorAno(year, user) {
     // Define a estrutura de categorias DENTRO do objeto do utilizador.
     const userData = financeData.years[year][user];
 
-    // Lista de todas as categorias de dados e objetivos.
+    // Lista de todas as categorias de dados e a de objetivos.
     const allCategories = ['conta-corrente', 'ativos', 'pprs', 'poupancas', 'outros'];
     const objectiveCategory = 'objectives';
 
@@ -253,6 +268,7 @@ function inicializarDadosUtilizadorAno(year, user) {
     if (!userData[objectiveCategory]) {
         userData[objectiveCategory] = {};
         allCategories.forEach(categoria => {
+            // O valor inicial para cada objetivo de categoria é 0.
             userData[objectiveCategory][categoria] = 0;
         });
     }
@@ -260,64 +276,69 @@ function inicializarDadosUtilizadorAno(year, user) {
 
 
 /**
- * Garante que a estrutura de dados para um determinado ano e utilizador existe e está atualizada.
+ * [VERSÃO FINAL E CORRIGIDA]
+ * Garante que a estrutura de dados completa para um determinado ano e utilizador existe.
  * Esta função é "idempotente": pode ser chamada múltiplas vezes sem causar efeitos secundários.
  * Se a estrutura não existir, ela é criada.
- * Se for uma estrutura antiga (pré-v2.0), ela é migrada para o formato mais recente.
+ * Se for uma estrutura antiga (pré-v3.0), ela é migrada para o formato mais recente.
  * @param {number} year - O ano a verificar.
  * @param {string} user - O utilizador a verificar.
  */
 function garantirEstruturaDados(year, user) {
-    // Passo 1: Garante que o objeto do ano existe.
+    // Garante que o objeto do ano e do utilizador existem.
     if (!financeData.years[year]) {
         financeData.years[year] = {};
     }
-    
-    // Passo 2: Garante que o objeto do utilizador existe para esse ano.
     if (!financeData.years[year][user]) {
-        // Se não existir, chama a função de inicialização completa e termina.
         inicializarDadosUtilizadorAno(year, user);
-        return;
+        return; // Se inicializou do zero, a estrutura está garantidamente correta.
     }
 
-    // --- INÍCIO DA CORREÇÃO PRINCIPAL ---
-    // Passo 3: Garante que a categoria 'conta-corrente' existe para o utilizador.
-    // Este passo é crucial e corrige o erro "Cannot read properties of undefined".
-    if (!financeData.years[year][user]['conta-corrente']) {
-        financeData.years[year][user]['conta-corrente'] = {};
-    }
-    // --- FIM DA CORREÇÃO PRINCIPAL ---
+    const userData = financeData.years[year][user];
+    const allCategories = ['conta-corrente', 'ativos', 'pprs', 'poupancas', 'outros'];
 
-    // Passo 4: Agora que temos a certeza que a estrutura base existe, percorremos os meses
-    // para garantir a compatibilidade retroativa e a existência de cada mês.
-    meses.forEach(mes => {
-        // Garante que a estrutura para o mês existe dentro da conta-corrente.
-        if (!financeData.years[year][user]['conta-corrente'][mes]) {
-            financeData.years[year][user]['conta-corrente'][mes] = { 
-                ganhos: 0, 
-                gastos: { essenciais: 0, poupancas: 0, desejos: 0 } 
-            };
-            // Usa 'return' aqui para saltar para a próxima iteração do forEach.
-            return; 
-        }
-
-        const ccData = financeData.years[year][user]['conta-corrente'][mes];
-        
-        // Verifica e migra a sub-estrutura de 'gastos' se for um formato antigo.
-        if (typeof ccData.gastos !== 'object' || ccData.gastos === null || !('essenciais' in ccData.gastos)) {
-            const oldGastosValue = typeof ccData.gastos === 'number' ? ccData.gastos : 0;
-            
-            financeData.years[year][user]['conta-corrente'][mes].gastos = { 
-                essenciais: oldGastosValue, 
-                poupancas: 0, 
-                desejos: 0 
-            };
+    // Itera sobre TODAS as categorias para garantir que existem.
+    allCategories.forEach(categoria => {
+        if (!userData[categoria]) {
+            // Se uma categoria inteira falta, recria-a.
+            userData[categoria] = {};
+            meses.forEach(mes => {
+                if (categoria === 'conta-corrente') {
+                    userData[categoria][mes] = { ganhos: 0, gastos: { essenciais: 0, poupancas: 0, desejos: 0 } };
+                } else {
+                    userData[categoria][mes] = 0;
+                }
+            });
+        } else if (categoria === 'conta-corrente') {
+            // Se a categoria é 'conta-corrente', faz uma verificação mais profunda da sua sub-estrutura.
+            meses.forEach(mes => {
+                const ccData = userData[categoria][mes];
+                // Verifica e migra a sub-estrutura de 'gastos' se for um formato antigo.
+                if (!ccData || typeof ccData.gastos !== 'object' || ccData.gastos === null || !('essenciais' in ccData.gastos)) {
+                    const oldGastosValue = (typeof ccData === 'object' && ccData !== null && 'gastos' in ccData) ? (ccData.gastos || 0) : 0;
+                    const oldGanhosValue = (typeof ccData === 'object' && ccData !== null && 'ganhos' in ccData) ? (ccData.ganhos || 0) : 0;
+                    
+                    userData[categoria][mes] = { 
+                        ganhos: oldGanhosValue,
+                        gastos: { 
+                            essenciais: oldGastosValue, // Assume que o valor antigo de gastos era para 'essenciais'.
+                            poupancas: 0, 
+                            desejos: 0 
+                        } 
+                    };
+                }
+            });
         }
     });
+
+    // Garante que a secção de objetivos existe.
+    if (!userData.objectives) {
+        userData.objectives = {};
+        allCategories.forEach(cat => {
+            userData.objectives[cat] = 0;
+        });
+    }
 }
-
-
-
 
 
 // --- MANIPULAÇÃO DA UI ---
@@ -334,6 +355,8 @@ function mostrarSecao(idSecao) {
         atualizarTabelaAnual();
     } else if (idSecao === "graficos") {
         atualizarGraficos();
+	    } else if (idSecao === "futuro") { // <-- NOVA CONDIÇÃO
+        atualizarGraficosFuturo();
     }
 }
 
@@ -343,6 +366,8 @@ function alterarAno() {
     atualizarUICompleta();
     salvarDados();
     mostrarToast(`Ano alterado para ${financeData.currentYear}`, 'info');
+	
+	mostrarSecao('dashboard'); 
 }
 
 function alterarUtilizador() {
@@ -351,6 +376,8 @@ function alterarUtilizador() {
     atualizarUICompleta();
     salvarDados();
     mostrarToast(`Utilizador alterado para ${financeData.currentUser}`, 'info');
+	
+	mostrarSecao('dashboard'); 
 }
 
 function atualizarSeletorAno() {
@@ -828,6 +855,7 @@ function getClasseProgresso(percentagem) {
     return 'progress-low';
 }
 
+
 /**
  * [VERSÃO CORRIGIDA E FINAL]
  * Exporta os dados financeiros para um ficheiro JSON limpo e bem estruturado,
@@ -836,8 +864,10 @@ function getClasseProgresso(percentagem) {
 function exportarDados() {
     try {
         // Garante que todos os dados em memória estão na estrutura mais recente antes de exportar.
+        // Esta é uma boa prática para garantir a consistência dos dados.
         Object.keys(financeData.years).forEach(year => {
             Object.keys(financeData.years[year]).forEach(user => {
+                // Verifica se a chave é um utilizador válido para evitar processar dados corrompidos.
                 if (user === "JORGE" || user === "RITA" || user === "AMBOS") {
                     garantirEstruturaDados(parseInt(year), user);
                 }
@@ -845,23 +875,26 @@ function exportarDados() {
         });
 
         // --- CORREÇÃO PRINCIPAL AQUI ---
-        // Cria um objeto de dados limpo para exportação, contendo apenas a propriedade 'years'.
-        // Desta vez, NÃO modificamos a estrutura interna. Exportamos os dados como eles são.
+        // Em vez de tentar reconstruir o objeto, simplesmente usamos a estrutura existente
+        // que já está correta na variável `financeData`.
+        // Criamos um objeto para exportação que contém o estado completo da aplicação.
         const dadosParaExportar = {
-            years: financeData.years
+            years: financeData.years,
+            currentUser: financeData.currentUser,
+            currentYear: financeData.currentYear
         };
 
-        const dadosExportacao = {
+        const dadosExportacaoFinal = {
             meta: {
-                version: '3.0', // Versão final que representa a estrutura de gastos detalhada.
+                version: '4.0', // Versão que representa a estrutura de gastos detalhada.
                 exportDate: new Date().toISOString(),
                 appName: 'Gestor Financeiro'
             },
-            // Usa o objeto de dados limpo, que agora contém a estrutura de gastos completa.
+            // Usamos o objeto de dados completo.
             data: dadosParaExportar 
         };
         
-        const blob = new Blob([JSON.stringify(dadosExportacao, null, 2)], {
+        const blob = new Blob([JSON.stringify(dadosExportacaoFinal, null, 2)], {
             type: 'application/json'
         });
         
@@ -881,7 +914,6 @@ function exportarDados() {
         mostrarToast('Erro ao exportar dados', 'error');
     }
 }
-
 
 
 function processarFicheiroJSON(event) {
@@ -905,39 +937,46 @@ function processarFicheiroJSON(event) {
     reader.readAsText(ficheiro);
 }
 
-// script.js - Substituir a função confirmarImportacao
 
+/**
+ * [VERSÃO MELHORADA]
+ * Confirma a importação de um ficheiro JSON, detetando diferentes versões de formato.
+ * Após a importação, força a verificação e migração de toda a estrutura de dados.
+ */
 function confirmarImportacao(dados) {
     try {
         let dadosFinanceiros;
 
         // Verifica se o ficheiro tem a nova estrutura (com meta e data)
-        if (dados.meta && dados.data) {
+        if (dados.meta && dados.data && dados.data.years) {
             dadosFinanceiros = dados.data;
-            console.log(`A importar ficheiro versão ${dados.meta.version}`);
+            console.log(`A importar ficheiro versão ${dados.meta.version || 'desconhecida'}`);
         } 
-        // Verifica se é um ficheiro antigo (sem a estrutura meta/data)
+        // Verifica se é um ficheiro antigo (só com a chave 'years' no topo)
         else if (dados.years) {
             dadosFinanceiros = dados;
-            console.log("A importar ficheiro de versão antiga (pré 2.0).");
+            console.log("A importar ficheiro de versão antiga (pré 2.0). A estrutura será migrada.");
         } 
-        // Se a estrutura for desconhecida, lança um erro
+        // Se a estrutura for completamente desconhecida, lança um erro.
         else {
-            throw new Error('Estrutura de dados do ficheiro JSON é inválida ou não reconhecida.');
+            // throw new Error('Estrutura de dados do ficheiro JSON é inválida ou não reconhecida.');
+            throw new Error('A');
         }
 
-        // Atribui os dados importados
+        // Atribui os dados importados à variável global.
         financeData = {
             years: dadosFinanceiros.years || {},
             currentUser: dadosFinanceiros.currentUser || "AMBOS",
             currentYear: dadosFinanceiros.currentYear || new Date().getFullYear()
         };
         
-        // Após importar, percorre todos os dados e garante que estão na estrutura mais recente
-        // Isto é crucial para migrar dados de versões antigas para a nova estrutura de gastos
+        // Após importar, percorre TODOS os dados e garante que estão na estrutura mais recente.
+        // Isto é crucial para migrar dados de versões antigas para a nova estrutura.
         Object.keys(financeData.years).forEach(year => {
             Object.keys(financeData.years[year]).forEach(user => {
-                garantirEstruturaDados(parseInt(year), user);
+                if (user === "JORGE" || user === "RITA" || user === "AMBOS") {
+                    garantirEstruturaDados(parseInt(year), user);
+                }
             });
         });
 
@@ -948,11 +987,13 @@ function confirmarImportacao(dados) {
 
     } catch (error) {
         console.error('Erro ao importar dados:', error);
-        mostrarToast(`Erro ao importar: ${error.message}`, 'error');
+		//mostrarToast(`Erro ao importar: ${error.message}`, 'error');
+
     }
 }
 
-// --- MODAIS E TOASTS ---
+
+
 
 function abrirModal(modalId) {
     document.getElementById(modalId).style.display = 'flex';
@@ -1432,4 +1473,179 @@ async function gerarRelatorioPDF() {
     pdf.save(`Relatorio_${user}_${year}_${mesCapitalized}.pdf`);
     fecharModal('printReportModal');
     mostrarToast('Relatório PDF gerado com sucesso!', 'success');
+}
+
+// Adicione esta nova função no seu script.js, perto das outras funções de gráficos.
+
+/**
+ * Calcula a taxa de crescimento anual média com base em dados históricos.
+ * @param {number[]} historicalData - Um array de valores anuais.
+ * @returns {number} - A taxa de crescimento média (ex: 1.1 para 10% de crescimento).
+ */
+function calcularTaxaCrescimentoMedia(historicalData) {
+    const dataPoints = historicalData.filter(v => v > 0); // Considera apenas anos com valor > 0
+    if (dataPoints.length < 2) {
+        return 1.05; // Se não houver dados suficientes, assume um crescimento padrão de 5%
+    }
+
+    let totalGrowthRate = 0;
+    let periods = 0;
+
+    for (let i = 1; i < historicalData.length; i++) {
+        const previousValue = historicalData[i - 1];
+        const currentValue = historicalData[i];
+        
+        // Apenas calcula a taxa se o valor anterior for positivo para evitar divisão por zero
+        if (previousValue > 0) {
+            totalGrowthRate += currentValue / previousValue;
+            periods++;
+        }
+    }
+
+    if (periods === 0) {
+        return 1.05; // Retorna a taxa padrão se não houver períodos válidos
+    }
+
+    const averageGrowthRate = totalGrowthRate / periods;
+    // Garante que a taxa não seja negativa ou excessivamente baixa para projeções
+    return Math.max(1, averageGrowthRate); 
+}
+
+/**
+ * Gera dados de projeção com base no último valor e na taxa de crescimento.
+ * @param {number} ultimoValor - O último valor conhecido.
+ * @param {number} taxaCrescimento - A taxa de crescimento anual.
+ * @param {number} numAnos - O número de anos a projetar.
+ * @returns {number[]} - Um array com os valores projetados.
+ */
+function projetarValores(ultimoValor, taxaCrescimento, numAnos) {
+    const projecoes = [];
+    let valorAtual = ultimoValor;
+
+    for (let i = 0; i < numAnos; i++) {
+        valorAtual *= taxaCrescimento;
+        projecoes.push(valorAtual);
+    }
+    return projecoes;
+}
+
+// Adicione esta nova função no seu script.js
+
+/**
+ * Cria ou atualiza um gráfico que inclui uma linha de dados históricos e uma linha de projeção.
+ * @param {string} canvasId - O ID do elemento canvas.
+ * @param {string} label - O rótulo principal para os dados.
+ * @param {number[]} labels - Os rótulos do eixo X (anos).
+ * @param {number[]} historicalData - Os dados históricos.
+ * @param {number[]} projectionData - Os dados projetados.
+ * @param {string} historicalColor - A cor da linha de histórico.
+ * @param {string} projectionColor - A cor da linha de projeção (amarelo).
+ */
+function criarGraficoComProjecao(canvasId, label, labels, historicalData, projectionData, historicalColor, projectionColor) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+
+    // O nome da instância do gráfico é derivado do ID do canvas
+    const chartInstanceName = canvasId.replace('chart-', '').replace('-', '');
+    if (charts[chartInstanceName]) {
+        charts[chartInstanceName].destroy();
+    }
+
+    // O último ponto do histórico é o primeiro da projeção para ligar as linhas
+    const fullProjectionData = [...new Array(historicalData.length - 1).fill(null), historicalData[historicalData.length - 1], ...projectionData];
+
+    charts[chartInstanceName] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: `Histórico ${label}`,
+                    data: historicalData,
+                    borderColor: historicalColor,
+                    backgroundColor: historicalColor + '20',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: `Projeção ${label}`,
+                    data: fullProjectionData,
+                    borderColor: projectionColor,
+                    borderWidth: 3,
+                    borderDash: [5, 5], // Linha tracejada para a projeção
+                    fill: false,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { 
+                    display: true, // Mostra a legenda para distinguir histórico de projeção
+                    position: 'top',
+                } 
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: value => formatarMoeda(value) }
+                }
+            },
+            elements: { point: { radius: 5, hoverRadius: 7 } }
+        }
+    });
+}
+
+// No script.js, substitua a função existente por esta versão
+
+function atualizarGraficosFuturo() {
+    const { currentUser, currentYear } = financeData;
+
+    // A lógica de definição de anos permanece a mesma
+    const anosHistoricos = Array.from({ length: currentYear - 2021 + 1 }, (_, i) => 2021 + i);
+    const anoInicioProjecao = currentYear + 1;
+    const anosProjecao = Array.from({ length: 10 }, (_, i) => anoInicioProjecao + i);
+    const todosOsAnos = [...anosHistoricos, ...anosProjecao];
+
+    // Obter todos os dados históricos
+    const dadosHistoricosTotal = anosHistoricos.map(ano => {
+        let total = 0;
+        Object.keys(categorias).filter(cat => cat !== 'total').forEach(categoria => {
+            total += obterUltimoValorPreenchido(ano, currentUser, categoria);
+        });
+        return total;
+    });
+    const dadosHistoricosPPRs = anosHistoricos.map(ano => obterUltimoValorPreenchido(ano, currentUser, 'pprs'));
+    const dadosHistoricosAtivos = anosHistoricos.map(ano => obterUltimoValorPreenchido(ano, currentUser, 'ativos'));
+
+    // --- NOVA LÓGICA PARA A TAXA DE CRESCIMENTO DOS PPRs ---
+    // 1. Pegamos nos dados históricos completos dos PPRs.
+    // 2. Usamos o método .slice(-3) para obter apenas os últimos 3 elementos (anos) do array.
+    const ultimos3AnosPPRs = dadosHistoricosPPRs.slice(-3);
+    
+    // 3. Calculamos a taxa de crescimento média usando APENAS esses 3 anos.
+    const taxaPPRs = calcularTaxaCrescimentoMedia(ultimos3AnosPPRs);
+    // --- FIM DA NOVA LÓGICA ---
+
+    // Calcular as outras taxas de crescimento normalmente, usando o histórico completo
+    const taxaTotal = calcularTaxaCrescimentoMedia(dadosHistoricosTotal);
+    const taxaAtivos = calcularTaxaCrescimentoMedia(dadosHistoricosAtivos);
+
+    // Gerar projeções (a lógica aqui permanece a mesma)
+    const ultimoValorTotal = dadosHistoricosTotal[dadosHistoricosTotal.length - 1] || 0;
+    const ultimoValorPPRs = dadosHistoricosPPRs[dadosHistoricosPPRs.length - 1] || 0;
+    const ultimoValorAtivos = dadosHistoricosAtivos[dadosHistoricosAtivos.length - 1] || 0;
+
+    const projecaoTotal = projetarValores(ultimoValorTotal, taxaTotal, anosProjecao.length);
+    const projecaoPPRs = projetarValores(ultimoValorPPRs, taxaPPRs, anosProjecao.length); // Esta projeção usará a nova taxa calculada
+    const projecaoAtivos = projetarValores(ultimoValorAtivos, taxaAtivos, anosProjecao.length);
+
+    // Desenhar os gráficos (nenhuma alteração necessária aqui)
+    const corProjecao = '#f39c12'; // Amarelo
+    criarGraficoComProjecao('chart-futuro-total', 'Total', todosOsAnos, dadosHistoricosTotal, projecaoTotal, '#2563eb', corProjecao);
+    criarGraficoComProjecao('chart-futuro-pprs', 'PPRs', todosOsAnos, dadosHistoricosPPRs, projecaoPPRs, '#dc2626', corProjecao);
+    criarGraficoComProjecao('chart-futuro-ativos', 'Ativos', todosOsAnos, dadosHistoricosAtivos, projecaoAtivos, '#16a34a', corProjecao);
 }
