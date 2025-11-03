@@ -1,0 +1,923 @@
+/* Reset e Variáveis CSS */
+:root {
+    /* Cores Principais */
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --success-color: #27ae60;
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+    --info-color: #17a2b8;
+    
+    /* Cores de Fundo */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #ecf0f1;
+    
+    /* Cores de Texto */
+    --text-primary: #2c3e50;
+    --text-secondary: #6c757d;
+    --text-muted: #95a5a6;
+    
+    /* Cores de Borda */
+    --border-color: #dee2e6;
+    --border-light: #e9ecef;
+    
+    /* Sombras */
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    
+    /* Transições */
+    --transition: all 0.3s ease;
+    
+    /* Espaçamentos */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 3rem;
+    
+    /* Tipografia */
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 2rem;
+    
+    /* Border Radius */
+    --border-radius: 0.375rem;
+    --border-radius-lg: 0.5rem;
+}
+
+/* Rodapé */
+footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border-color);
+  color: var(--gray-600);
+  font-size: 0.7rem;
+}
+
+/* Tema Escuro */
+[data-theme="dark"] {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #3d3d3d;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-muted: #888888;
+    --border-color: #404040;
+    --border-light: #505050;
+}
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    transition: var(--transition);
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+/* Cabeçalho */
+.header {
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--spacing-md) 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.header-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+/* Navegação por Abas */
+.nav-tabs {
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--spacing-sm) 0;
+}
+
+.tabs {
+    display: flex;
+    gap: var(--spacing-xs);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.tab-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Conteúdo Principal */
+.main-content {
+    padding: var(--spacing-lg) 0;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.section-header {
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+}
+
+.section-header h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.section-header p {
+    color: var(--text-secondary);
+    font-size: var(--font-size-lg);
+}
+
+/* Cards */
+.card {
+    background-color: var(--bg-primary);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+    margin-bottom: var(--spacing-lg);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-light);
+    background-color: var(--bg-secondary);
+}
+
+.card-header h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* Summary Cards */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.summary-card {
+    background-color: var(--bg-primary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: var(--transition);
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.summary-card.conta-corrente .card-icon { background-color: var(--primary-color); }
+.summary-card.ativos .card-icon { background-color: var(--secondary-color); }
+.summary-card.pprs .card-icon { background-color: var(--success-color); }
+.summary-card.outros .card-icon { background-color: var(--warning-color); }
+.summary-card.poupancas .card-icon { background-color: var(--info-color); }
+.summary-card.total .card-icon { background-color: var(--primary-color); }
+
+.card-content { flex: 1; }
+
+.card-content h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.card-value {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.card-variation {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.variation-text {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius);
+}
+
+.variation-positive {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: var(--success-color);
+}
+
+.variation-negative {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: var(--danger-color);
+}
+
+.variation-neutral {
+    background-color: var(--bg-tertiary);
+    color: var(--text-muted);
+}
+
+/* Tabelas */
+.table-responsive {
+    overflow-x: auto;
+    padding: var(--spacing-lg);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+}
+
+.data-table th,
+.data-table td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.data-table th {
+    background-color: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.data-table tbody tr:hover { background-color: var(--bg-tertiary); }
+.data-table .currency { text-align: right; font-weight: 500; }
+.data-table .variation { text-align: center; font-weight: 600; }
+
+/* Inputs Mensais e Layout de Cards */
+.monthly-inputs { padding: var(--spacing-lg); }
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+}
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+.input-label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+.input-field {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+.input-field:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+.input-variation {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius);
+    text-align: center;
+    min-height: 1.5rem;
+}
+
+/* Botões */
+.btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    text-decoration: none;
+    line-height: 1.5;
+}
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn.primary { background-color: var(--primary-color); color: white; }
+.btn.primary:hover:not(:disabled) { background-color: #34495e; }
+.btn.secondary { background-color: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); }
+.btn.secondary:hover:not(:disabled) { background-color: var(--border-color); }
+.btn.success { background-color: var(--success-color); color: white; }
+.btn.success:hover:not(:disabled) { background-color: #229954; }
+
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.toast {
+    background-color: #6c757d; /* Cor de fundo cinzenta por defeito */
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    color: white;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    animation: slideIn 0.3s ease;
+    max-width: 300px;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* --- REGRAS DE COR DE FUNDO REFORÇADAS (A CORREÇÃO ESTÁ AQUI) --- */
+/* Usamos o ID do container para aumentar a especificidade e garantir que estas regras são aplicadas */
+
+#toast-container .toast.success {
+    background-color: var(--success-color, #27ae60); /* Verde com fallback */
+}
+
+#toast-container .toast.error {
+    background-color: var(--danger-color, #e74c3c); /* Vermelho com fallback */
+}
+
+#toast-container .toast.info {
+    background-color: var(--info-color, #17a2b8); /* Azul info com fallback */
+}
+
+#toast-container .toast.warning {
+    background-color: var(--warning-color, #f39c12); /* Amarelo com fallback */
+}
+/* --- FIM DA CORREÇÃO --- */
+
+.toast-close {
+    background: none;
+    border: none;
+    color: white;
+    opacity: 0.8;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 0 5px;
+    font-size: 1.1rem;
+}
+
+.toast-close:hover {
+    opacity: 1;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: var(--bg-primary);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+.modal-header { padding: var(--spacing-lg); border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
+.modal-header h3 { font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-color); }
+.modal-close { background: none; border: none; font-size: var(--font-size-lg); color: var(--text-secondary); cursor: pointer; padding: var(--spacing-xs); border-radius: var(--border-radius); transition: var(--transition); }
+.modal-close:hover { background-color: var(--bg-tertiary); color: var(--text-primary); }
+.modal-body { padding: var(--spacing-lg); }
+.modal-footer { padding: var(--spacing-lg); border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end; gap: var(--spacing-sm); }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* Estilos para importação de ficheiros */
+.file-input-container { margin: var(--spacing-lg) 0; text-align: center; }
+.file-input { display: none; }
+.file-input-label { display: inline-block; padding: var(--spacing-lg) var(--spacing-xl); background-color: var(--bg-tertiary); border: 2px dashed var(--border-color); border-radius: var(--border-radius-lg); cursor: pointer; transition: var(--transition); font-size: var(--font-size-lg); color: var(--text-secondary); }
+.file-input-label:hover { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color); }
+.file-input-label i { font-size: 2rem; display: block; margin-bottom: var(--spacing-sm); }
+.import-preview { margin-top: var(--spacing-lg); padding: var(--spacing-lg); background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); }
+.import-preview h4 { margin-bottom: var(--spacing-md); color: var(--primary-color); }
+
+/* Layout de Cards para Registo Mensal */
+.month-navigation { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg); padding: var(--spacing-sm); background-color: var(--bg-primary); border-radius: var(--border-radius); box-shadow: var(--shadow-sm); }
+.current-month-display { font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-color); }
+.monthly-cards-container { position: relative; min-height: 250px; }
+.month-card { background-color: var(--bg-primary); border-radius: var(--border-radius-lg); box-shadow: var(--shadow); padding: var(--spacing-lg); position: absolute; width: 100%; opacity: 0; visibility: hidden; transform: translateX(20px); transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s; }
+.month-card.active { opacity: 1; visibility: visible; transform: translateX(0); z-index: 10; }
+.month-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.month-card-header h3 { font-size: var(--font-size-xl); color: var(--primary-color); margin: 0; }
+.month-card-content { display: grid; gap: var(--spacing-lg); }
+
+/* Estilos para Gráficos */
+.chart-container { padding: var(--spacing-lg); min-height: 400px; display: flex; align-items: center; justify-content: center; }
+.chart-canvas { max-width: 100%; max-height: 400px; width: 100%; height: 400px; }
+
+/* Estilos para o seletor de ano */
+.year-selector { padding: var(--spacing-xs) var(--spacing-sm); border: 1px solid var(--border-color); border-radius: var(--border-radius); background-color: var(--bg-primary); color: var(--text-primary); font-size: var(--font-size-base); cursor: pointer; transition: var(--transition); }
+.year-selector:focus { outline: none; border-color: var(--secondary-color); box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
+
+/* Estilos para Objetivos */
+.year-indicator { background: var(--bg-secondary); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: var(--spacing-md); margin-bottom: var(--spacing-lg); text-align: center; }
+.year-indicator h3 { margin: 0; color: var(--primary-color); font-size: var(--font-size-xl); font-weight: 600; }
+.progress-indicator { margin-top: var(--spacing-sm); }
+.progress-bar { width: 100%; height: 8px; background-color: var(--bg-tertiary); border-radius: 4px; overflow: hidden; margin-bottom: var(--spacing-xs); }
+.progress-fill { height: 100%; transition: width 0.3s ease; border-radius: 4px; }
+.progress-fill.progress-low { background-color: var(--danger-color); }
+.progress-fill.progress-medium { background-color: var(--warning-color); }
+.progress-fill.progress-complete { background-color: var(--success-color); }
+.progress-text { font-size: var(--font-size-sm); color: var(--text-secondary); text-align: center; font-weight: 500; }
+
+/* Estilos para Ganhos e Gastos na Conta Corrente */
+.conta-corrente-group { display: flex; gap: var(--spacing-sm); align-items: center; }
+.input-wrapper { position: relative; display: flex; flex-direction: column; width: 100%; }
+.input-wrapper .input-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: var(--spacing-xs); }
+.input-wrapper.ganhos .input-label { color: var(--success-color); }
+.input-wrapper.gastos .input-label { color: var(--danger-color); }
+.total-mes-cc { font-size: var(--font-size-base); font-weight: 700; color: var(--text-primary); margin-top: var(--spacing-sm); text-align: center; padding: var(--spacing-xs); border-top: 1px solid var(--border-light); }
+
+/* Modal de Registo Rápido */
+.modal-content.large { max-width: 800px; }
+.form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-lg); }
+.form-group { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.form-group label { font-weight: 600; color: var(--text-secondary); font-size: var(--font-size-sm); }
+.form-group .input-field { width: 100%; }
+.form-group.span-3 { grid-column: span 3; }
+
+/* Otimização de Espaço para o Modal de Registo Rápido */
+#registerMonthModal .modal-body { padding: var(--spacing-md) var(--spacing-lg); }
+#registerMonthModal .form-grid { gap: var(--spacing-md); }
+#registerMonthModal .form-group { gap: var(--spacing-xs); }
+#registerMonthModal .form-group label { font-size: 0.8rem; font-weight: 500; }
+#registerMonthModal .input-field { font-size: 0.9rem; padding: var(--spacing-sm) var(--spacing-sm); }
+#registerMonthModal .conta-corrente-group { gap: var(--spacing-sm); }
+#registerMonthModal .input-wrapper .input-label { font-size: 0.75rem; }
+#registerMonthModal .modal-footer { padding: var(--spacing-md); }
+
+/* --- VERSÃO FINAL: Layout Lado a Lado Compacto para Conta Corrente --- */
+.cc-content-wrapper {
+    display: flex;
+    flex-wrap: nowrap; /* Impede a quebra de linha em ecrãs maiores */
+    gap: var(--spacing-lg);
+    align-items: flex-start;
+}
+.cc-inputs-area {
+    flex: 1 1 60%; /* Ocupa 60% do espaço, permitindo encolher se necessário */
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm); /* Espaçamento mais pequeno entre os inputs */
+}
+.cc-chart-area {
+    flex: 1 1 40%; /* Ocupa 40% do espaço, permitindo encolher */
+    max-width: 220px; /* Define uma largura máxima estrita para o gráfico */
+    margin-left: auto; /* Empurra o gráfico para a direita se houver espaço extra */
+    position: sticky;
+    top: 20px;
+}
+.chart-container-small {
+    position: relative;
+    width: 100%;
+    height: auto;
+}
+.chart-canvas-small {
+    max-width: 100%;
+    max-height: 250px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .header-content { flex-direction: column; gap: var(--spacing-md); text-align: center; }
+    .form-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-group.span-3 { grid-column: span 2; }
+}
+@media (max-width: 700px) {
+    .cc-content-wrapper { flex-direction: column; align-items: center; }
+    .cc-inputs-area { width: 100%; max-width: 400px; }
+    .cc-chart-area { position: static; margin-top: var(--spacing-lg); width: 100%; }
+}
+@media (max-width: 576px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.span-2, .form-group.span-3 { grid-column: span 1; }
+}
+@media (max-width: 480px) {
+    .month-navigation { flex-wrap: wrap; justify-content: center; gap: var(--spacing-sm); }
+    .month-navigation .btn { flex-grow: 1; }
+    .current-month-display { order: -1; width: 100%; text-align: center; margin-bottom: var(--spacing-sm); }
+}
+
+
+
+/* Ajustes para o botão de exportar no card-header */
+.card-header {
+    display: flex;
+    justify-content: space-between; /* Alinha os itens nas extremidades */
+    align-items: center;
+}
+
+.card-header h3 {
+    margin: 0; /* Remove margem padrão do h3 */
+}
+
+.btn.btn-small {
+    /* padding: var(--spacing-xs) var(--spacing-sm);  Torna o botão mais compacto */
+    font-size: 0.7rem;
+}
+
+/* styles.css - Adicionar no final do ficheiro */
+
+/* Estilos para o formulário do modal de impressão */
+.form-grid-print {
+    display: grid;
+    grid-template-columns: 1fr; /* Uma coluna para simplicidade */
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.dark-theme-override {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --border-color: #404040;
+    --border-light: #505050;
+    background-color: var(--bg-secondary); /* Garante que o fundo da div é pintado */
+}
+/* styles.css - Substituir o bloco de estilos do PDF */
+
+/* --- VERSÃO FINALÍSSIMA: Estilos para o Relatório de Linha Completa --- */
+
+/* Contentor principal para a lista de cards no PDF */
+#pdf-render-target .pdf-list-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Espaço vertical entre cada linha/card */
+    padding: 20px;
+    background-color: #f8f9fa;
+    font-family: var(--font-family);
+}
+
+/* Estilo para cada linha/card do relatório */
+#pdf-render-target .pdf-list-item {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
+
+/* Contentor para a parte esquerda (ícone e texto) */
+#pdf-render-target .pdf-item-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Ícone circular */
+#pdf-render-target .pdf-item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+/* Contentor para o texto (título e percentagem) */
+#pdf-render-target .pdf-item-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinha o texto à esquerda */
+}
+
+/* Título da Categoria */
+#pdf-render-target .pdf-item-title {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Percentagem */
+#pdf-render-target .pdf-item-percentage {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: var(--border-radius);
+}
+
+/* Valor monetário (à direita) */
+#pdf-render-target .pdf-item-value {
+    margin-left: auto; /* A MÁGICA: empurra o valor para a extrema direita */
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding-left: 20px; /* Garante espaço entre o texto e o valor */
+}
+
+/* Cores da percentagem */
+.pdf-item-percentage.positive { background-color: rgba(39, 174, 96, 0.1); color: var(--success-color); }
+.pdf-item-percentage.negative { background-color: rgba(231, 76, 60, 0.1); color: var(--danger-color); }
+.pdf-item-percentage.neutral { background-color: var(--bg-tertiary); color: var(--text-muted); }
+
+/* Cores de fundo dos ícones */
+#pdf-render-target .pdf-item-icon.conta-corrente { background-color: var(--primary-color); }
+#pdf-render-target .pdf-item-icon.ativos { background-color: var(--secondary-color); }
+#pdf-render-target .pdf-item-icon.pprs { background-color: var(--success-color); }
+#pdf-render-target .pdf-item-icon.poupancas { background-color: var(--info-color); }
+#pdf-render-target .pdf-item-icon.outros { background-color: var(--warning-color); }
+#pdf-render-target .pdf-item-icon.total { background-color: var(--primary-color); }
+
+/* Separador horizontal */
+#pdf-render-target .pdf-section-separator {
+    border-top: 1px solid var(--border-light);
+    margin: 25px 0;
+}
+
+/* Contentor principal para a secção do gráfico (título + conteúdo) */
+#pdf-render-target .pdf-gastos-chart-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Aumenta o espaço entre o título e o conteúdo */
+    width: 100%;
+}
+
+/* Título da secção do gráfico */
+#pdf-render-target .pdf-gastos-chart-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* --- A MÁGICA DO LAYOUT LADO A LADO ESTÁ AQUI --- */
+/* Contentor que envolve o gráfico e a legenda */
+#pdf-render-target .pdf-chart-wrapper {
+    display: flex;
+    align-items: center; /* Alinha o gráfico e a legenda verticalmente */
+    justify-content: center; /* Centraliza o conjunto */
+    gap: 30px; /* Espaço entre o gráfico e a legenda */
+    width: 100%;
+}
+
+/* Contentor do canvas do gráfico (coluna da esquerda) */
+#pdf-render-target .pdf-chart-container {
+    width: 100%;
+    max-width: 250px; /* Reduz o tamanho máximo do gráfico */
+    height: auto;
+}
+
+/* Contentor para a legenda personalizada (coluna da direita) */
+#pdf-render-target .pdf-chart-legend {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px; /* Espaço entre cada item da legenda */
+}
+/* --- FIM DA MÁGICA DO LAYOUT --- */
+
+/* Cada linha da legenda */
+#pdf-render-target .pdf-legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+/* O quadrado de cor */
+#pdf-render-target .pdf-legend-color-box {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    margin-right: 10px;
+}
+
+/* O nome da categoria e a percentagem (agora juntos) */
+#pdf-render-target .pdf-legend-label {
+    font-weight: 500;
+}
+
+/* --- RESPONSIVIDADE --- */
+
+/* Para Tablets e Telemóveis em modo paisagem (até 768px) */
+@media (max-width: 768px) {
+    /* Reduz o espaçamento geral para aproveitar melhor o espaço */
+    .container {
+        padding: 0 var(--spacing-sm);
+    }
+
+    /* Empilha o cabeçalho verticalmente */
+    .header-content {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    /* Permite que as abas de navegação ocupem a largura toda se necessário */
+    .tabs {
+        justify-content: flex-start; /* Começa da esquerda */
+    }
+
+    /* Força os cards do dashboard a ficarem numa única coluna */
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+
+    /* --- A MUDANÇA MAIS IMPORTANTE --- */
+    /* Força o layout da Conta Corrente para uma única coluna */
+    .cc-layout-wrapper {
+        grid-template-columns: 1fr; /* Passa de 2 colunas para 1 */
+    }
+
+    /* Remove a posição "sticky" do gráfico para que ele flua normalmente no layout */
+    .cc-chart-container {
+        position: static;
+    }
+
+    /* Força o modal de registo rápido para uma única coluna */
+    #registerMonthModal .modal-body {
+        grid-template-columns: 1fr;
+    }
+    #registerMonthModal .form-group.span-2 {
+        grid-column: span 1; /* Remove o span de 2 colunas */
+    }
+}
+
+/* Para Telemóveis em modo retrato (até 480px) */
+@media (max-width: 480px) {
+    /* Ajusta os tamanhos de fonte para melhor leitura em ecrãs pequenos */
+    body {
+        font-size: 0.95rem; /* Ligeiramente mais pequeno */
+    }
+    .app-title {
+        font-size: 1.3rem;
+    }
+    .section-header h2 {
+        font-size: 1.3rem;
+    }
+    .card-value {
+        font-size: 1.4rem;
+    }
+
+    /* Otimiza a navegação dos meses para ecrãs muito estreitos */
+    .month-navigation {
+        flex-wrap: wrap; /* Permite que os botões quebrem a linha */
+        justify-content: center;
+        gap: var(--spacing-sm);
+    }
+    .month-navigation .btn {
+        flex-grow: 1; /* Faz os botões "Anterior" e "Seguinte" ocuparem o espaço */
+    }
+    .current-month-display {
+        order: -1; /* Coloca o nome do mês no topo */
+        width: 100%;
+        text-align: center;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    /* Ajusta o padding dos cards para não parecerem tão "apertados" */
+    .card {
+        padding: var(--spacing-sm);
+    }
+    .summary-card {
+        padding: var(--spacing-md);
+    }
+
+    /* Melhora o layout do modal de registo */
+    #registerMonthModal .modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+}
