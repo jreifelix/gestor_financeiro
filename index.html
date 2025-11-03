@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor Financeiro</title>
+     <link rel="stylesheet" href="fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/chart.js"></script>
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/html2canvas.min.js"></script>
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <i class="fas fa-chart-line"></i>
+                    Gestor Financeiro
+                </h1>
+                <div class="header-actions">
+                    <select id="yearSelector" class="year-selector"></select>
+                    <select id="userSelector" class="year-selector"></select>
+                    <button id="themeToggle" class="year-selector" aria-label="Alternar tema">
+                        <i class="fas fa-moon"></i>
+                    </button>
+					<button id="openPrintModalBtn" class="btn secondary" aria-label="Imprimir Relatório">
+						<i class="fas fa-print"></i></button>
+                    <button id="openRegisterModalBtn" class="btn success" aria-label="Registar Mês">
+                        <i class="fas fa-plus-circle"></i></button>
+                    <button id="importBtn" class="btn secondary" aria-label="Importar dados">
+                        <i class="fas fa-upload"></i></button>
+                    <button id="exportBtn" class="btn primary" aria-label="Exportar dados">
+                        <i class="fas fa-download"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegação por Abas -->
+    <nav class="nav-tabs">
+        <div class="container">
+            <div class="tabs">
+                <button class="tab-btn active" data-target="dashboard" aria-label="Dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </button>
+                <button class="tab-btn" data-target="conta-corrente" aria-label="Conta Corrente">
+                    <i class="fas fa-university"></i>
+                    Conta Corrente
+                </button>
+                <button class="tab-btn" data-target="ativos" aria-label="Ativos">
+                    <i class="fas fa-chart-pie"></i>
+                    Ativos
+                </button>
+                <button class="tab-btn" data-target="pprs" aria-label="PPRs">
+                    <i class="fas fa-piggy-bank"></i>
+                    PPRs
+                </button>
+                <button class="tab-btn" data-target="poupancas" aria-label="Poupanças">
+                    <i class="fas fa-wallet"></i>
+                    Poupanças
+                </button>
+                <button class="tab-btn" data-target="outros" aria-label="Outros">
+                    <i class="fas fa-ellipsis-h"></i>
+                    Outros
+                </button>
+                <button class="tab-btn" data-target="resumo-anual" aria-label="Resumo Anual">
+                    <i class="fas fa-table"></i>
+                    Resumo Anual
+                </button>
+                <button class="tab-btn" data-target="objetivos" aria-label="Objetivos">
+                    <i class="fas fa-bullseye"></i>
+                    Objetivos
+                </button>
+                <button class="tab-btn" data-target="graficos" aria-label="Gráficos">
+                    <i class="fas fa-chart-line"></i>
+                    Gráficos
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Dashboard -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-tachometer-alt"></i> Dashboard Financeiro</h2>
+                    <!-- <p>Visão geral dos seus dados financeiros</p> -->
+                </div>
+                
+                <!-- Resumo por Categoria -->
+                <div class="summary-cards">
+                    <div class="summary-card conta-corrente">
+                        <div class="card-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Conta Corrente</h3>
+                            <div class="card-value" id="summary-conta-corrente">€0,00</div>
+                            <div class="card-variation" id="variation-conta-corrente">
+                                <span class="variation-text">0,00%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card ativos">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Ativos</h3>
+                            <div class="card-value" id="summary-ativos">€0,00</div>
+                            <div class="card-variation" id="variation-ativos">
+                                <span class="variation-text">0,00%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card pprs">
+                        <div class="card-icon">
+                            <i class="fas fa-piggy-bank"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>PPRs</h3>
+                            <div class="card-value" id="summary-pprs">€0,00</div>
+                            <div class="card-variation" id="variation-pprs">
+                                <span class="variation-text">0,00%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card poupancas">
+                        <div class="card-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Poupanças</h3>
+                            <div class="card-value" id="summary-poupancas">€0,00</div>
+                            <div class="card-variation" id="variation-poupancas">
+                                <span class="variation-text">0,00%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card outros">
+                        <div class="card-icon">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Outros</h3>
+                            <div class="card-value" id="summary-outros">€0,00</div>
+                            <div class="card-variation" id="variation-outros">
+                                <span class="variation-text">0,00%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card total">
+                        <div class="card-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Total</h3>
+                            <div class="card-value" id="summary-total">€0,00</div>
+                            <div class="card-variation" id="variation-total">
+                                <span class="variation-text">0,00%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conta Corrente -->
+            <section id="conta-corrente" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-university"></i> Conta Corrente</h2>
+                    <p>Registe os valores da sua conta corrente</p>
+                </div>
+                <div class="month-navigation" id="conta-corrente-nav">
+                    <button class="btn secondary prev-month"><i class="fas fa-chevron-left"></i> Mês Anterior</button>
+                    <h3 class="current-month-display">Janeiro</h3>
+                    <button class="btn secondary next-month">Mês Seguinte <i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="monthly-cards-container" id="conta-corrente-cards">
+                    <!-- Cards serão gerados dinamicamente pelo JavaScript -->
+                </div>
+            </section>
+
+            <!-- Ativos -->
+            <section id="ativos" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-pie"></i> Ativos</h2>
+                    <p>Registe o valor dos seus investimentos</p>
+                </div>
+                <div class="month-navigation" id="ativos-nav">
+                    <button class="btn secondary prev-month"><i class="fas fa-chevron-left"></i> Mês Anterior</button>
+                    <h3 class="current-month-display">Janeiro</h3>
+                    <button class="btn secondary next-month">Mês Seguinte <i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="monthly-cards-container" id="ativos-cards"></div>
+            </section>
+
+            <!-- PPRs -->
+            <section id="pprs" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-piggy-bank"></i> PPRs</h2>
+                    <p>Registe o valor dos seus Planos Poupança Reforma</p>
+                </div>
+                <div class="month-navigation" id="pprs-nav">
+                    <button class="btn secondary prev-month"><i class="fas fa-chevron-left"></i> Mês Anterior</button>
+                    <h3 class="current-month-display">Janeiro</h3>
+                    <button class="btn secondary next-month">Mês Seguinte <i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="monthly-cards-container" id="pprs-cards"></div>
+            </section>
+
+            <!-- Poupanças -->
+            <section id="poupancas" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-wallet"></i> Poupanças</h2>
+                    <p>Registe o valor das suas poupanças</p>
+                </div>
+                <div class="month-navigation" id="poupancas-nav">
+                    <button class="btn secondary prev-month"><i class="fas fa-chevron-left"></i> Mês Anterior</button>
+                    <h3 class="current-month-display">Janeiro</h3>
+                    <button class="btn secondary next-month">Mês Seguinte <i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="monthly-cards-container" id="poupancas-cards"></div>
+            </section>
+
+            <!-- Outros -->
+            <section id="outros" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-ellipsis-h"></i> Outros</h2>
+                    <p>Registe outros ativos ou passivos financeiros</p>
+                </div>
+                <div class="month-navigation" id="outros-nav">
+                    <button class="btn secondary prev-month"><i class="fas fa-chevron-left"></i> Mês Anterior</button>
+                    <h3 class="current-month-display">Janeiro</h3>
+                    <button class="btn secondary next-month">Mês Seguinte <i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="monthly-cards-container" id="outros-cards"></div>
+            </section>
+
+            <!-- Resumo Anual -->
+            <section id="resumo-anual" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-table"></i> Resumo Anual</h2>
+                    <p>Visão geral dos seus dados financeiros anuais</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-table"></i> Resumo Anual</h3>
+						<button id="exportAnnualSummaryBtn" class="btn primary btn-small" aria-label="Exportar para Excel">
+							<i class="fas fa-file-excel"></i>
+						</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table" id="annual-summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Categoria</th>
+                                    <th>Jan</th>
+                                    <th>Fev</th>
+                                    <th>Mar</th>
+                                    <th>Abr</th>
+                                    <th>Mai</th>
+                                    <th>Jun</th>
+                                    <th>Jul</th>
+                                    <th>Ago</th>
+                                    <th>Set</th>
+                                    <th>Out</th>
+                                    <th>Nov</th>
+                                    <th>Dez</th>
+                                </tr>
+                            </thead>
+                            <tbody id="annual-summary-body">
+                                <!-- Dados serão inseridos dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Objetivos -->
+            <section id="objetivos" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-bullseye"></i> Objetivos Financeiros</h2>
+                    <p>Defina os seus objetivos anuais</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bullseye"></i> Objetivos por Categoria</h3>
+                    </div>
+                    <div class="monthly-inputs">
+                        <div class="input-grid" id="objetivos-inputs">
+                            <!-- Os inputs de objetivos serão gerados dinamicamente pelo JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gráficos -->
+            <section id="graficos" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-line"></i> Gráficos de Evolução</h2>
+                    <p>Visualize a evolução dos seus dados financeiros ao longo dos anos</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calculator"></i> Evolução do Total (2021-2031 )</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-total" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-piggy-bank"></i> Evolução dos PPRs (2021-2031)</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-pprs" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Evolução dos Ativos (2021-2031)</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-ativos" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Modal de Registo Rápido -->
+    <div id="registerMonthModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Registo Rápido de Mês</h3>
+                <button class="modal-close" onclick="fecharModal('registerMonthModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="registerMonthForm">
+                    <div class="form-grid">
+                        <!-- Linha de Seletores -->
+                        <div class="form-group">
+                            <label for="modalUserSelector">Utilizador</label>
+                            <select id="modalUserSelector" class="input-field"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalYearSelector">Ano</label>
+                            <select id="modalYearSelector" class="input-field"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalMonthSelector">Mês</label>
+                            <select id="modalMonthSelector" class="input-field"></select>
+                        </div>
+
+                        <!-- Linha de Conta Corrente -->
+                        <div class="form-group span-3">
+                            <label>Conta Corrente</label>
+                            <div class="conta-corrente-group">
+                                <div class="input-wrapper ganhos">
+                                    <label class="input-label">Ganhos</label>
+                                    <input type="number" id="modalGanhos" step="0.01" min="0" class="input-field" placeholder="0,00">
+                                </div>
+                                <div class="input-wrapper gastos">
+                                    <label class="input-label">Gastos Essenciais</label>
+                                    <input type="number" id="modalGastosEssenciais" step="0.01" min="0" class="input-field" placeholder="0,00">
+                                </div>
+                                <div class="input-wrapper gastos">
+                                    <label class="input-label">Gastos Poupanças</label>
+                                    <input type="number" id="modalGastosPoupancas" step="0.01" min="0" class="input-field" placeholder="0,00">
+                                </div>
+                                <div class="input-wrapper gastos">
+                                    <label class="input-label">Gastos Desejos</label>
+                                    <input type="number" id="modalGastosDesejos" step="0.01" min="0" class="input-field" placeholder="0,00">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Outras Categorias -->
+                        <div class="form-group">
+                            <label for="modalAtivos">Ativos</label>
+                            <input type="number" id="modalAtivos" step="0.01" min="0" class="input-field" placeholder="0,00">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalPPRs">PPRs</label>
+                            <input type="number" id="modalPPRs" step="0.01" min="0" class="input-field" placeholder="0,00">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalPoupancas">Poupanças</label>
+                            <input type="number" id="modalPoupancas" step="0.01" min="0" class="input-field" placeholder="0,00">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalOutros">Outros</label>
+                            <input type="number" id="modalOutros" step="0.01" min="0" class="input-field" placeholder="0,00">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary" onclick="fecharModal('registerMonthModal')">Cancelar</button>
+                <button class="btn success" id="saveMonthDataBtn">
+                    <i class="fas fa-save"></i>
+                    Guardar Registo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Importação -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Importar Dados Financeiros</h3>
+                <button class="modal-close" onclick="fecharModal('importModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Selecione um ficheiro JSON para importar os seus dados financeiros.</p>
+                <div class="file-input-container">
+                    <input type="file" id="jsonFileInput" accept=".json" class="file-input">
+                    <label for="jsonFileInput" class="file-input-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Escolher ficheiro JSON
+                    </label>
+                </div>
+                <div id="importPreview" class="import-preview" style="display: none;">
+                    <h4>Pré-visualização dos dados:</h4>
+                    <pre id="previewContent" style="max-height: 200px; overflow: auto;"></pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary" onclick="fecharModal('importModal')">Cancelar</button>
+                <button class="btn primary" id="confirmImport" disabled>Importar Dados</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirmTitle">Confirmar Ação</h3>
+                <button class="modal-close" onclick="fecharModal('confirmModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Tem a certeza que deseja continuar?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary" onclick="fecharModal('confirmModal')">Cancelar</button>
+                <button class="btn primary" id="confirmAction">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+	
+	<div id="printReportModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-file-pdf"></i> Gerar Relatório PDF</h3>
+            <button class="modal-close" onclick="fecharModal('printReportModal' )">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>Selecione os parâmetros para o seu relatório mensal.</p>
+            <div class="form-grid-print">
+                <div class="form-group">
+                    <label for="printUserSelector">Utilizador</label>
+                    <select id="printUserSelector" class="input-field"></select>
+                </div>
+                <div class="form-group">
+                    <label for="printYearSelector">Ano</label>
+                    <select id="printYearSelector" class="input-field"></select>
+                </div>
+                <div class="form-group">
+                    <label for="printMonthSelector">Mês</label>
+                    <select id="printMonthSelector" class="input-field"></select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn secondary" onclick="fecharModal('printReportModal')">Cancelar</button>
+            <button class="btn primary" id="generatePdfBtn">
+                <i class="fas fa-cogs"></i>
+                Gerar PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Div temporária para renderizar o dashboard para o PDF (ficará invisível) -->
+<div id="pdf-render-target" style="position: absolute; left: -9999px; width: 800px; padding: 20px; background-color: #fff;"></div>
+ <footer>
+        <p>&copy; Gestor Financeiro. Jorge Félix.</p>
+      </footer>
+</body>
+</html>
